@@ -93,7 +93,7 @@ void Channel(){
 	// Rutina de lectura de datos
 	std::vector<double> n_values, b_values, s_values;
 
-	std::ifstream infile("Data/NData_NBkg_Signal124.0.csv"); // Archivo de entrada
+	std::ifstream infile("Data/NData_NBkg_Signal124.csv"); // Archivo de entrada
 	if (!infile.is_open()){
 		std::cerr << " Error al abrir el archivo de datos " << std::endl;
 		return; 
