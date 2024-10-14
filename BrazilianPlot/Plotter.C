@@ -7,6 +7,9 @@
 #include <TH1D.h>
 #include <TStyle.h>
 #include <TROOT.h>
+#include <TVectorD.h>
+#include <TGraphErrors.h>
+#include <TGraphAsymmErrors.h>
 
 
 
@@ -136,6 +139,26 @@ void Plotter(){
 
 	infile.close(); // Cerrar archivo de datos
 
+	Int_t N = mass.size();
+
+	// Dynamic Arrays
+	Double_t *Mass_ = new Double_t[N];
+	Double_t *Expected_ = new Double_t[N];
+	
+	
+	// Filling Array
+	for (size_t i = 0; i < mass.size(); ++i){
+	     Mass_[i] = mass[i];
+	     Expected_[i] = expected[i];
+	     //std::cout << mass[i] << " " << observed[i] << std::endl;
+	}
+	// TVectorD for plotting
+	TVectorD *Mass = new TVectorD();
+	Mass->Use(N,Mass_);
+	TVectorD *Expected = new TVectorD();
+	Expected->Use(N,Expected_);
+	
+	
 
 	// Rutina para hacer es histograma
 
@@ -144,13 +167,12 @@ void Plotter(){
 
 
 
-	// Filling channels
-	for (size_t i = 0; i < mass.size(); ++i){
-
-		std::cout << mass[i] << " " << observed[i] << std::endl;
-
-	}
-
+	TGraphAsymmErrors *ExpectedGraph = new TGraphAsymmErrors(*Mass,*Expected,*Expected,*Expected,*Expected,*Expected);
+	
+	
+	ExpectedGraph->SetFillColor(kGreen);
+	
+        ExpectedGraph->Draw("APL31");
 
 
 
@@ -164,9 +186,9 @@ void Plotter(){
 	leg->AddEntry(HSignal,"Signal + background","l");
 	leg->AddEntry(HData,"Data","p");
 	leg->Draw();
-
-    c->SaveAs("1ToyChannel.pdf");
 */
+	    c->SaveAs("UpperLimitMass.pdf");
+
 }
 
 int main(){
