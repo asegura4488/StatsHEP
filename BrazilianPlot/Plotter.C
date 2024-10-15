@@ -169,7 +169,7 @@ void Plotter(){
 
 	// Rutina para hacer es histograma
 
-	TCanvas *c = new TCanvas("c","Upper Limit scan", 200,200,900,900);
+	TCanvas *c = new TCanvas("c","Upper Limit scan", 200,200,1000,500);
 	//c->SetGrid();
 
 	// Solo importan los errores en Y
