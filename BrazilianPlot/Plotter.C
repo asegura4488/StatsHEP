@@ -144,12 +144,26 @@ void Plotter(){
 	// Dynamic Arrays
 	Double_t *Mass_ = new Double_t[N];
 	Double_t *Expected_ = new Double_t[N];
+	Double_t *Observed_ = new Double_t[N];
+	
+	
+	Double_t *Msigma1_ = new Double_t[N];
+	Double_t *Sigma1_ = new Double_t[N];
+	Double_t *Msigma2_ = new Double_t[N];
+	Double_t *Sigma2_ = new Double_t[N];
 	
 	
 	// Filling Array
 	for (size_t i = 0; i < mass.size(); ++i){
 	     Mass_[i] = mass[i];
 	     Expected_[i] = expected[i];
+	     Observed_[i] = observed[i];
+	     
+	     Msigma1_[i] = msigma1[i];
+	     Sigma1_[i] = sigma1[i];
+	     
+	     Msigma2_[i] = msigma2[i];
+	     Sigma2_[i] = sigma2[i];
 	     //std::cout << mass[i] << " " << observed[i] << std::endl;
 	}
 	// TVectorD for plotting
@@ -157,7 +171,19 @@ void Plotter(){
 	Mass->Use(N,Mass_);
 	TVectorD *Expected = new TVectorD();
 	Expected->Use(N,Expected_);
+	TVectorD *Observed = new TVectorD();
+	Observed->Use(N,Observed_);
 	
+	TVectorD *Msigma1 = new TVectorD();
+	Msigma1->Use(N,Msigma1_);
+	TVectorD *Sigma1 = new TVectorD();
+	Sigma1->Use(N,Sigma1_);
+	
+	
+	TVectorD *Msigma2 = new TVectorD();
+	Msigma2->Use(N,Msigma2_);
+	TVectorD *Sigma2 = new TVectorD();
+	Sigma2->Use(N,Sigma2_);
 	
 
 	// Rutina para hacer es histograma
@@ -165,29 +191,49 @@ void Plotter(){
 	TCanvas *c = new TCanvas("c","Upper Limit scan", 200,200,800,800);
 	//c->SetGrid();
 
-
-
-	TGraphAsymmErrors *ExpectedGraph = new TGraphAsymmErrors(*Mass,*Expected,*Expected,*Expected,*Expected,*Expected);
 	
+	TGraphAsymmErrors *ExpectedGraph1 = new TGraphAsymmErrors(*Mass,*Expected,*Expected,*Expected,*Msigma1,*Sigma1);
+	TGraphAsymmErrors *ExpectedGraph2 = new TGraphAsymmErrors(*Mass,*Expected,*Expected,*Expected,*Msigma2,*Sigma2);
 	
-	ExpectedGraph->SetFillColor(kGreen);
+	TGraph *ExpectedGraph = new TGraph(*Mass,*Expected);
+	TGraph *ObservedGraph = new TGraph(*Mass,*Observed);
 	
-        ExpectedGraph->Draw("APL31");
+	ExpectedGraph1->SetFillColor(kGreen);	
+	ExpectedGraph2->SetFillColor(kYellow);
+	
 
+	ExpectedGraph1->SetLineStyle(2); // Dash line        
+        ExpectedGraph2->SetLineStyle(2); // Dash line
+        ExpectedGraph->SetLineStyle(2);       
+        
+        ExpectedGraph->SetLineWidth(3);
+        ObservedGraph->SetLineWidth(3);
+        
+        ExpectedGraph2->GetXaxis()->SetLimits(100.,160.);
+        ExpectedGraph1->GetXaxis()->SetLimits(100.,160.);
+        ExpectedGraph->GetXaxis()->SetLimits(100.,160.);
+        ObservedGraph->GetXaxis()->SetLimits(100.,160.);
+
+       
+        ExpectedGraph2->Draw("APL31");
+	ExpectedGraph1->Draw("same31");
+        ExpectedGraph->Draw("same"); 
+        ObservedGraph->Draw("same");
 
 
 	// Re drawing x-axis
 	gPad->RedrawAxis();
 
-/*
-	TLegend *leg = new TLegend(0.414787,0.6829897,0.8934837,0.8956186,NULL,"brNDC");
-	leg->SetHeader("1-Channel","C");
-	leg->AddEntry(HBkg,"Background","f");
-	leg->AddEntry(HSignal,"Signal + background","l");
-	leg->AddEntry(HData,"Data","p");
+
+	TLegend *leg = new TLegend(0.7397727,0.6823394,0.8954545,0.8944954,NULL,"brNDC");
+	leg->SetHeader("Upper limits","C");
+	leg->AddEntry(ObservedGraph,"Observed","l");
+	leg->AddEntry(ExpectedGraph,"Expected","l");
+	leg->AddEntry(ExpectedGraph1,"1#sigma","Cf");
+	leg->AddEntry(ExpectedGraph2,"2#sigma","Cf");
 	leg->Draw();
-*/
-	    c->SaveAs("UpperLimitMass.pdf");
+
+	 c->SaveAs("UpperLimitMass.pdf");
 
 }
 
