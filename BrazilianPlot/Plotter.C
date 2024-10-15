@@ -3,6 +3,7 @@
 #include <vector>
 #include <sstream>
 #include <TCanvas.h>
+#include <TAxis.h>
 #include <TLegend.h>
 #include <TH1D.h>
 #include <TStyle.h>
@@ -33,58 +34,38 @@ void SetTemplateStyle(){
 
 }
 
-void SetHistoLimits(TH1D *H, double xmin, double xmax, double ymin, double ymax){
-	H->GetXaxis()->SetLimits(xmin,xmax);
-	H->SetMinimum(ymin);
-	H->SetMaximum(ymax);
+void SetLimits(TGraphAsymmErrors *g, double xmin, double xmax, double ymin, double ymax){
+	g->GetXaxis()->SetRangeUser(xmin,xmax);
+	g->SetMinimum(ymin);
+	g->SetMaximum(ymax);
 }
 
-void SetHistoStyle(TH1D *H, std::string Xname, std::string Yname, int Id = 0){
+void SetStyle(TGraphAsymmErrors *g, std::string Xname, std::string Yname, int Id = 0){
 
 
-	H->SetTitle("");
+	g->SetTitle("");
 
 	// Axis
-	H->GetXaxis()->SetTitle(Xname.c_str());
-	H->GetXaxis()->SetTitleOffset(0.9);
-	H->GetXaxis()->SetTitleSize(0.05);
+	g->GetXaxis()->SetTitle(Xname.c_str());
+	g->GetXaxis()->SetTitleOffset(0.9);
+	g->GetXaxis()->SetTitleSize(0.05);
 
-	H->GetYaxis()->SetTitle(Yname.c_str());
-	H->GetYaxis()->SetTitleOffset(1.2);
-	H->GetYaxis()->SetTitleSize(0.05);
+	g->GetYaxis()->SetTitle(Yname.c_str());
+	g->GetYaxis()->SetTitleOffset(1.2);
+	g->GetYaxis()->SetTitleSize(0.05);
 
 	//Labels
-	H->GetXaxis()->SetLabelOffset(0.01);
-	H->GetXaxis()->SetLabelSize(0.04);
-	H->GetXaxis()->SetLabelColor(1);
+	g->GetXaxis()->SetLabelOffset(0.01);
+	g->GetXaxis()->SetLabelSize(0.04);
+	g->GetXaxis()->SetLabelColor(1);
 
-	H->GetYaxis()->SetLabelOffset(0.01);
-	H->GetYaxis()->SetLabelSize(0.04);
-	H->GetYaxis()->SetLabelColor(1);
+	g->GetYaxis()->SetLabelOffset(0.01);
+	g->GetYaxis()->SetLabelSize(0.04);
+	g->GetYaxis()->SetLabelColor(1);
 
 	// Ticks
-	H->GetXaxis()->SetTickLength(0.04);
-	H->GetYaxis()->SetTickLength(0.04);
-
-	if (Id == 0){
-		H->SetLineColor(kBlack);
-		H->SetMarkerColor(kBlack);
-		H->SetMarkerStyle(20);
-		H->SetMarkerSize(1.3);
-	}
-	else if (Id == 1){
-		H->SetFillStyle(3002);
-		H->SetFillColor(kBlue);
-		H->SetLineColor(kBlue);
-	}
-	else if (Id == 2){
-		//H->SetFillStyle(3002);
-		//H->SetFillColor(kRed);
-
-		H->SetLineColor(kRed);
-		H->SetLineStyle(7);
-		H->SetLineWidth(2);
-	}
+	g->GetXaxis()->SetTickLength(0.04);
+	g->GetYaxis()->SetTickLength(0.04);
 	
 }
 
@@ -188,33 +169,34 @@ void Plotter(){
 
 	// Rutina para hacer es histograma
 
-	TCanvas *c = new TCanvas("c","Upper Limit scan", 200,200,800,800);
+	TCanvas *c = new TCanvas("c","Upper Limit scan", 200,200,900,900);
 	//c->SetGrid();
 
-	
+	// Solo importan los errores en Y
 	TGraphAsymmErrors *ExpectedGraph1 = new TGraphAsymmErrors(*Mass,*Expected,*Expected,*Expected,*Msigma1,*Sigma1);
 	TGraphAsymmErrors *ExpectedGraph2 = new TGraphAsymmErrors(*Mass,*Expected,*Expected,*Expected,*Msigma2,*Sigma2);
 	
 	TGraph *ExpectedGraph = new TGraph(*Mass,*Expected);
 	TGraph *ObservedGraph = new TGraph(*Mass,*Observed);
 	
-	ExpectedGraph1->SetFillColor(kGreen);	
-	ExpectedGraph2->SetFillColor(kYellow);
 	
-
 	ExpectedGraph1->SetLineStyle(2); // Dash line        
         ExpectedGraph2->SetLineStyle(2); // Dash line
-        ExpectedGraph->SetLineStyle(2);       
+        ExpectedGraph->SetLineStyle(2);  // Dash line     
         
         ExpectedGraph->SetLineWidth(3);
         ObservedGraph->SetLineWidth(3);
-        
-        ExpectedGraph2->GetXaxis()->SetLimits(100.,160.);
-        ExpectedGraph1->GetXaxis()->SetLimits(100.,160.);
-        ExpectedGraph->GetXaxis()->SetLimits(100.,160.);
-        ObservedGraph->GetXaxis()->SetLimits(100.,160.);
 
-       
+	ExpectedGraph1->SetFillColor(kGreen);	
+	ExpectedGraph2->SetFillColor(kYellow);
+
+        
+        SetLimits(ExpectedGraph1,100.,160.,0.,1.6);
+        SetLimits(ExpectedGraph2,100.,160.,0.,1.6);
+
+        SetStyle(ExpectedGraph2,"m(H)[GeV]","Upper limits at 95% CL");
+
+ 
         ExpectedGraph2->Draw("APL31");
 	ExpectedGraph1->Draw("same31");
         ExpectedGraph->Draw("same"); 
@@ -224,16 +206,22 @@ void Plotter(){
 	// Re drawing x-axis
 	gPad->RedrawAxis();
 
+	/*
+	Podria Servir
+	TAxis *eje = ExpectedGraph2->GetXaxis();
+	eje->SetRangeUser(100,160);
+        */
 
-	TLegend *leg = new TLegend(0.7397727,0.6823394,0.8954545,0.8944954,NULL,"brNDC");
-	leg->SetHeader("Upper limits","C");
+	TLegend *leg = new TLegend(0.6357955,0.6823394,0.8960227,0.8944954,NULL,"brNDC");
+	leg->SetHeader("Upper limits for #mu","C");
 	leg->AddEntry(ObservedGraph,"Observed","l");
 	leg->AddEntry(ExpectedGraph,"Expected","l");
 	leg->AddEntry(ExpectedGraph1,"1#sigma","Cf");
 	leg->AddEntry(ExpectedGraph2,"2#sigma","Cf");
 	leg->Draw();
 
-	 c->SaveAs("UpperLimitMass.pdf");
+	c->Modified();
+	c->SaveAs("UpperLimitMass.pdf");
 
 }
 

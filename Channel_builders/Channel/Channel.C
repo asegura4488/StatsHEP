@@ -199,7 +199,7 @@ void Channel(){
 	gPad->RedrawAxis();
 
 
-	TLegend *leg = new TLegend(0.414787,0.6829897,0.8934837,0.8956186,NULL,"brNDC");
+	TLegend *leg = new TLegend(0.5744318,0.6811927,0.8965909,0.8933486,NULL,"brNDC");
 	leg->SetHeader("1-Channel","C");
 	leg->AddEntry(HBkg,"Background","f");
 	leg->AddEntry(HSignal,"Signal + background","l");
