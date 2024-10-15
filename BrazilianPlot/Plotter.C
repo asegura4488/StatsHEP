@@ -194,7 +194,7 @@ void Plotter(){
         SetLimits(ExpectedGraph1,100.,160.,0.,1.6);
         SetLimits(ExpectedGraph2,100.,160.,0.,1.6);
 
-        SetStyle(ExpectedGraph2,"m(H)[GeV]","Upper limits at 95% CL");
+        SetStyle(ExpectedGraph2,"m(H)[GeV]","95% CL limits on #mu");
 
  
         ExpectedGraph2->Draw("APL31");
@@ -213,11 +213,11 @@ void Plotter(){
         */
 
 	TLegend *leg = new TLegend(0.6357955,0.6823394,0.8960227,0.8944954,NULL,"brNDC");
-	leg->SetHeader("Upper limits for #mu","C");
+	//leg->SetHeader("Upper limits for #mu","C");
 	leg->AddEntry(ObservedGraph,"Observed","l");
 	leg->AddEntry(ExpectedGraph,"Expected","l");
-	leg->AddEntry(ExpectedGraph1,"1#sigma","Cf");
-	leg->AddEntry(ExpectedGraph2,"2#sigma","Cf");
+	leg->AddEntry(ExpectedGraph1,"Expected #pm 1#sigma","lf");
+	leg->AddEntry(ExpectedGraph2,"Expected #pm 2#sigma","lf");
 	leg->Draw();
 
 	c->Modified();
