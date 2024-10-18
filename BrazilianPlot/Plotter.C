@@ -23,7 +23,7 @@ void SetTemplateStyle(){
 	gStyle->SetPadRightMargin(0.1);
 
    	 // Stats and title
-    	gStyle->SetOptStat(0);
+    gStyle->SetOptStat(0);
 	gStyle->SetOptTitle(0);
 
 	// Log-scale
@@ -51,7 +51,7 @@ void SetStyle(TGraphAsymmErrors *g, std::string Xname, std::string Yname, int Id
 	g->GetXaxis()->SetTitleSize(0.05);
 
 	g->GetYaxis()->SetTitle(Yname.c_str());
-	g->GetYaxis()->SetTitleOffset(1.2);
+	g->GetYaxis()->SetTitleOffset(1.1);
 	g->GetYaxis()->SetTitleSize(0.05);
 
 	//Labels
@@ -75,7 +75,7 @@ void Plotter(){
 	SetTemplateStyle();
 
 	// Rutina de lectura de datos
-	std::vector<double> mass, msigma2, msigma1, expected, sigma1, sigma2, observed;
+	std::vector<double> Vmass, Vmsigma2, Vmsigma1, Vexpected, Vsigma1, Vsigma2, Vobserved;
 
 	std::ifstream infile("UpperLimitMassScan.csv"); // Archivo de entrada
 	if (!infile.is_open()){
@@ -97,7 +97,7 @@ void Plotter(){
 		}
 
 
-		// Variables para almacenar temporalemente n,b,s
+		// Variables para almacenar temporalemente la informacion
 		double mass_,msigma2_,msigma1_,expected_,sigma1_,sigma2_,observed_;
 
 		// Crear un stream a partir de la linea para leer n,b,s
@@ -108,116 +108,119 @@ void Plotter(){
 			continue;
 		}
 
-		mass.push_back(mass_);
-		msigma2.push_back(msigma2_);
-		msigma1.push_back(msigma1_);
-		expected.push_back(expected_);
-		sigma1.push_back(sigma1_);
-		sigma2.push_back(sigma2_);
-		observed.push_back(observed_);
+		Vmass.push_back(mass_);
+		Vmsigma2.push_back(msigma2_);
+		Vmsigma1.push_back(msigma1_);
+		Vexpected.push_back(expected_);
+		Vsigma1.push_back(sigma1_);
+		Vsigma2.push_back(sigma2_);
+		Vobserved.push_back(observed_);
 
 	}
 
 	infile.close(); // Cerrar archivo de datos
 
-	Int_t N = mass.size();
+
+	// Tamaño del vector
+	Int_t N = Vmass.size();
 
 	// Dynamic Arrays
-	Double_t *Mass_ = new Double_t[N];
-	Double_t *Expected_ = new Double_t[N];
-	Double_t *Observed_ = new Double_t[N];
+	Double_t *DMass = new Double_t[N];
+	Double_t *DMsigma2 = new Double_t[N];
+	Double_t *DMsigma1 = new Double_t[N];
+	Double_t *DExpected = new Double_t[N];
+	Double_t *DSigma1 = new Double_t[N];
+	Double_t *DSigma2 = new Double_t[N];
+	Double_t *DObserved = new Double_t[N];
 	
 	
-	Double_t *Msigma1_ = new Double_t[N];
-	Double_t *Sigma1_ = new Double_t[N];
-	Double_t *Msigma2_ = new Double_t[N];
-	Double_t *Sigma2_ = new Double_t[N];
-	
-	
-	// Filling Array
-	for (size_t i = 0; i < mass.size(); ++i){
-	     Mass_[i] = mass[i];
-	     Expected_[i] = expected[i];
-	     Observed_[i] = observed[i];
-	     
-	     Msigma1_[i] = msigma1[i];
-	     Sigma1_[i] = sigma1[i];
-	     
-	     Msigma2_[i] = msigma2[i];
-	     Sigma2_[i] = sigma2[i];
-	     //std::cout << mass[i] << " " << observed[i] << std::endl;
+	// Filling Dynamic Arrays
+	for (size_t i = 0; i < N; ++i){
+	     DMass[i] = Vmass[i];
+	     DMsigma2[i] = Vmsigma2[i];
+	     DMsigma1[i] = Vmsigma1[i];
+	     DExpected[i] = Vexpected[i];
+	     DSigma1[i] = Vsigma1[i];
+	     DSigma2[i] = Vsigma2[i];
+	     DObserved[i] = Vobserved[i];
 	}
+
 	// TVectorD for plotting
 	TVectorD *Mass = new TVectorD();
-	Mass->Use(N,Mass_);
-	TVectorD *Expected = new TVectorD();
-	Expected->Use(N,Expected_);
-	TVectorD *Observed = new TVectorD();
-	Observed->Use(N,Observed_);
-	
-	TVectorD *Msigma1 = new TVectorD();
-	Msigma1->Use(N,Msigma1_);
-	TVectorD *Sigma1 = new TVectorD();
-	Sigma1->Use(N,Sigma1_);
-	
-	
+	Mass->Use(N,DMass);
+
 	TVectorD *Msigma2 = new TVectorD();
-	Msigma2->Use(N,Msigma2_);
+	Msigma2->Use(N,DMsigma2);
+	TVectorD *Msigma1 = new TVectorD();
+	Msigma1->Use(N,DMsigma1);
+
+	TVectorD *Expected = new TVectorD();
+	Expected->Use(N,DExpected);
+
+	TVectorD *Sigma1 = new TVectorD();
+	Sigma1->Use(N,DSigma1);
+	
 	TVectorD *Sigma2 = new TVectorD();
-	Sigma2->Use(N,Sigma2_);
+	Sigma2->Use(N,DSigma2);
+	
+	TVectorD *Observed = new TVectorD();
+	Observed->Use(N,DObserved);
+	
 	
 
 	// Rutina para hacer es histograma
 
-	TCanvas *c = new TCanvas("c","Upper Limit scan", 200,200,1000,500);
+	TCanvas *c = new TCanvas("c","Upper Limit scan", 200,200,900,500);
 	//c->SetGrid();
 
 	// Solo importan los errores en Y
-	TGraphAsymmErrors *ExpectedGraph1 = new TGraphAsymmErrors(*Mass,*Expected,*Expected,*Expected,*Msigma1,*Sigma1);
-	TGraphAsymmErrors *ExpectedGraph2 = new TGraphAsymmErrors(*Mass,*Expected,*Expected,*Expected,*Msigma2,*Sigma2);
+
+	TGraphAsymmErrors *Expected1Sigma = new TGraphAsymmErrors(*Mass,*Expected,*Expected,*Expected,*Msigma1,*Sigma1);
+	TGraphAsymmErrors *Expected2Sigma = new TGraphAsymmErrors(*Mass,*Expected,*Expected,*Expected,*Msigma2,*Sigma2);
 	
 	TGraph *ExpectedGraph = new TGraph(*Mass,*Expected);
 	TGraph *ObservedGraph = new TGraph(*Mass,*Observed);
 	
 	
-	ExpectedGraph1->SetLineStyle(2); // Dash line        
-        ExpectedGraph2->SetLineStyle(2); // Dash line
-        ExpectedGraph->SetLineStyle(2);  // Dash line     
+	Expected1Sigma->SetLineStyle(2); // Dash line        
+    Expected2Sigma->SetLineStyle(2); // Dash line
+    ExpectedGraph->SetLineStyle(2);  // Dash line     
         
-        ExpectedGraph->SetLineWidth(3);
-        ObservedGraph->SetLineWidth(3);
+    ExpectedGraph->SetLineWidth(3);
+    ObservedGraph->SetLineWidth(3);
 
-	ExpectedGraph1->SetFillColor(kGreen);	
-	ExpectedGraph2->SetFillColor(kYellow);
+	Expected1Sigma->SetFillColor(kGreen);	
+	Expected2Sigma->SetFillColor(kYellow);
 
         
-        SetLimits(ExpectedGraph1,100.,160.,0.,1.6);
-        SetLimits(ExpectedGraph2,100.,160.,0.,1.6);
+    SetLimits(Expected1Sigma,100.,160.,0.,1.6);
+    SetLimits(Expected2Sigma,100.,160.,0.,1.6);
 
-        SetStyle(ExpectedGraph2,"m(H)[GeV]","95% CL limits on #mu");
+    SetStyle(Expected2Sigma,"m(H)[GeV]","95% CL limits on #mu");
 
  
-        ExpectedGraph2->Draw("APL31");
-	ExpectedGraph1->Draw("same31");
-        ExpectedGraph->Draw("same"); 
-        ObservedGraph->Draw("same");
+ 	// plotting
+    Expected2Sigma->Draw("APL31");
+	Expected1Sigma->Draw("same31");
+    ExpectedGraph->Draw("same"); 
+    ObservedGraph->Draw("same");
 
 
 	// Re drawing x-axis
 	gPad->RedrawAxis();
 
 	/*
-	Podria Servir
+	Podria Servir para manipular el TAxis
 	TAxis *eje = ExpectedGraph2->GetXaxis();
 	eje->SetRangeUser(100,160);
-        */
+     */
 
 	TLegend *leg = new TLegend(0.6357955,0.6823394,0.8960227,0.8944954,NULL,"brNDC");
 	//leg->SetHeader("Upper limits for #mu","C");
 	leg->AddEntry(ObservedGraph,"Observed","l");
 	leg->AddEntry(ExpectedGraph,"Expected","l");
-	leg->AddEntry(ExpectedGraph1,"Expected #pm 1#sigma","lf");
-	leg->AddEntry(ExpectedGraph2,"Expected #pm 2#sigma","lf");
+	leg->AddEntry(Expected1Sigma,"Expected #pm 1#sigma","lf");
+	leg->AddEntry(Expected2Sigma,"Expected #pm 2#sigma","lf");
 	leg->Draw();
 
 	c->Modified();
