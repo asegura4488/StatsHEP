@@ -77,7 +77,7 @@ void Plotter(){
 	// Rutina de lectura de datos
 	std::vector<double> Vmass, Vmsigma2, Vmsigma1, Vexpected, Vsigma1, Vsigma2, Vobserved;
 
-	std::ifstream infile("UpperLimitMassScan.csv"); // Archivo de entrada
+	std::ifstream infile("UpperLimitMassScanqm.csv"); // Archivo de entrada
 	if (!infile.is_open()){
 		std::cerr << " Error al abrir el archivo de datos " << std::endl;
 		return; 
