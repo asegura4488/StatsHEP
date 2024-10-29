@@ -42,7 +42,7 @@ void ProfileLikelihood(bool is_inverter = true){
 
 
    RooStats::FrequentistCalculator *freqCalc = new RooStats::FrequentistCalculator(*data, *bModel, *mc);
-   freqCalc->SetToys(2000, 2000);
+   freqCalc->SetToys(3000, 3000);
 
    RooStats::ToyMCSampler *ToyMC = (RooStats::ToyMCSampler*)freqCalc->GetTestStatSampler();
    ToyMC->SetTestStatistic(ProfileLike);
@@ -87,7 +87,7 @@ void ProfileLikelihood(bool is_inverter = true){
    Inverter->SetConfidenceLevel(0.95);
    Inverter->UseCLs(true);
    Inverter->SetVerbose(true); // don't show details
-   Inverter->SetFixedScan(5,0.1,2.0); // POI scan
+   Inverter->SetFixedScan(15,0.,2.0); // POI scan
 
    RooStats::HypoTestInverterResult *IResult =  Inverter->GetInterval();
    RooStats::HypoTestInverterPlot* IPlot = new RooStats::HypoTestInverterPlot("IPlot","Pvalue Scan",IResult);
