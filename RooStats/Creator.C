@@ -9,7 +9,7 @@ void Creator(bool Toy = true){
   // Rutina de lectura de datos
 	std::vector<double> n_values, b_values, s_values;
 
-	std::ifstream infile("Data/NData_NBkg_Signal160.0.csv"); // Archivo de entrada
+	std::ifstream infile("Data/NData_NBkg_Signal124.0.csv"); // Archivo de entrada
 	if (!infile.is_open()){
 		std::cerr << " Error al abrir el archivo de datos " << std::endl;
 		return; 
@@ -117,7 +117,7 @@ void Creator(bool Toy = true){
 
    RooStats::HistFactory::Sample *Bkg = new RooStats::HistFactory::Sample("Bkg");
    Bkg->SetHisto(HBkg);
-   Bkg->AddOverallSys("BkgSys", 0.8, 1.2); 
+   Bkg->AddOverallSys("BkgSys", 0.95, 1.05); 
 
    RooStats::HistFactory::Sample *Signal = new RooStats::HistFactory::Sample("Signal");
    Signal->AddNormFactor("mu",1.,0.,10.);
